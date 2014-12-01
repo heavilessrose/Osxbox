@@ -10,10 +10,8 @@ Osxbox currently reports (more features incoming):
 
 ## Setup
 ```sh
-git clone https://github.com/wynkth/osxbox.git
-cd osxbox
-chmod +x configure.py
-chmod +x main.py
+git clone https://github.com/wynkth/Osxbox.git
+cd Osxbox
 ./configure.py
 ```
 ## Usage
