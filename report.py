@@ -21,7 +21,7 @@ class Report:
     report: Generate and prints the report.
   """
 
-  def __init__(self):
+  def __init__(self, initial_pid):
     self.pids = set()
     self.processes = set()
     self.files_opened = set()
@@ -33,13 +33,7 @@ class Report:
       self.f_whitelist.add(line.strip())
     whitelist.close()
 
-  def add_pid(self, pid):
-    """Adds a new pid to the pids set.
-
-    Args:
-      pid: PID of the process.
-    """
-    self.pids.add(pid)
+    self.pids.add(initial_pid)
 
   def new_process(self, pid, child, name):
     """Adds a new process created to the report.

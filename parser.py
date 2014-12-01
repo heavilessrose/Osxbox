@@ -11,22 +11,21 @@ import sys
 import signal
 from report import Report
 
-REPORT = Report()
-
-def handler(signum, frame):
-  """Signal handler
-
-  Used by the process to stop parsing the input,
-  print the report and exit.
-
-  Args are not relevant.
-  """
-  REPORT.report()
-  sys.exit(0)
-
 def main():
+  
+  def handler(signum, frame):
+    """Signal handler
+
+    Used by the process to stop parsing the input,
+    print the report and exit.
+
+    Args are not relevant.
+    """
+    report.report()
+    sys.exit(0)
+
   # Add the process PID to the report.
-  REPORT.add_pid(int(sys.argv[1]))
+  report = Report(int(sys.argv[1]))
 
   # Register SIGUSR1 handler with the function.
   signal.signal(signal.SIGUSR1, handler)
@@ -39,11 +38,11 @@ def main():
 
     if type == 'FILE':
       file = sys.stdin.readline().strip()
-      REPORT.file_opened(int(pid), file)
+      report.file_opened(int(pid), file)
     elif type == 'PROCESS':
       name = sys.stdin.readline().strip()
       child = sys.stdin.readline().strip()
-      REPORT.new_process(int(pid), int(child), name)
+      report.new_process(int(pid), int(child), name)
 
 if __name__ == '__main__':
   main()
