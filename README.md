@@ -22,7 +22,7 @@ sudo ./osxbox.py <command>
 
 ## Example
 ```sh
-sudo ./osxbox.py 'python examples/t.py'
+sudo ./osxbox.py 'python samples/t.py'
 ```
 Stdout and stderr of the process will be saved in the output.txt and error.txt, respectively.
 ### Example output
