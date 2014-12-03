@@ -7,33 +7,40 @@
 Osxbox currently reports (more features incoming):
   - Files opened
   - Processes created
+  - Network connections
 
 ## Setup
 ```sh
 git clone https://github.com/wynkth/Osxbox.git
 cd Osxbox
-./configure.py
+./ob_configure.py
 ```
 ## Usage
 ```sh
-sudo ./main.py <command>
+sudo ./osxbox.py <command>
 ```
 
 ## Example
 ```sh
-sudo ./main.py 'python examples/t.py'
+sudo ./osxbox.py 'python examples/t.py'
 ```
 Stdout and stderr of the process will be saved in the output.txt and error.txt, respectively.
-### Sample output
+### Example output
 ```
 ===============
  Osxbox report
 ===============
 
+###########################
+# Connections Established #
+###########################
+173.194.41.56:443
+173.194.41.56:80
+
 ####################
 # Processes opened #
 ####################
-<Pid_num>: test
+2244: test
 
 ################
 # Files opened #

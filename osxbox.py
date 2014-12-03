@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 
 """Osxbox main module:
-Initializes the target and dtrace process, synchronizes the
+Initializes the target, dtrace and network processes, synchronizes the
 dtrace and parser processes and waits for the process to finish
 or terminates it if the time limit is reached.
 
-Finally, signals the parser process for generate the report.
+Finally, signals the dtrace parser process for generate the
+dtrace and network reports.
 
 Copyright 2014, Jose Toro.
 Licensed under MIT.
@@ -18,6 +19,7 @@ import time
 import signal
 import pwd
 import shlex
+from ob_network import NetworkReport
 
 def main():
   """Main script of Osxbox."""
@@ -27,10 +29,10 @@ def main():
     sys.exit('Osxbox must be run as root')
 
   if not os.path.isfile('osxbox.conf'):
-    sys.exit('You must run \'./configure.py\' before run Osxbox')
+    sys.exit('You must run \'./ob_configure.py\' before run Osxbox')
 
   if len(sys.argv) != 2:
-    print 'usage: sudo ./main.py <process>'
+    print 'usage: sudo ./osxbox.py <process>'
     sys.exit(-1)
 
   # Time limit (in seconds) for the process to end.
@@ -48,14 +50,17 @@ def main():
   dtrace = subprocess.Popen(["/usr/sbin/dtrace", "-q", "-s", "script.d"], stdout=subprocess.PIPE)
   time.sleep(2)
 
+  # Start network collect
+  network = NetworkReport(sys.stdout)
+
   # Run process as normal user.
   user_uid = pwd.getpwnam(user).pw_uid
   process = subprocess.Popen(shlex.split(sys.argv[1]),
                              preexec_fn=change_user(user_uid),
                              stdout=out, stderr=err)
 
-  # Run dtrace parser.
-  parser = subprocess.Popen(["/usr/bin/python", "parser.py",
+  # Run dtrace dtrace_parser.
+  dtrace_parser = subprocess.Popen(["/usr/bin/python", "ob_dtrace.py",
                             str(process.pid)], stdin=dtrace.stdout)
 
   # Wait to the process to end or to the time limit reach.
@@ -67,6 +72,7 @@ def main():
   # Kill process if still alive.
   if process.poll() is None:
     process.terminate()
+    print 'Process terminated!\n'
 
   # Close output and error files.
   out.close()
@@ -75,9 +81,17 @@ def main():
   # Terminate dtrace.
   dtrace.terminate()
 
-  # Signal to parser, generate report.
-  parser.send_signal(signal.SIGUSR1)
+  # Print report.
+  print '===============\n' \
+        ' Osxbox report\n' \
+        '===============\n'
 
+  # Generate network report.
+  network.finish()
+  network.generate()
+
+  # Signal to dtrace_parser, generate dtrace report.
+  dtrace_parser.send_signal(signal.SIGUSR1)
 
 def change_user(user_uid):
   """Callback for Popen preexec_fn to change user uid.
